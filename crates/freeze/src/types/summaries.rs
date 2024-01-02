@@ -464,7 +464,7 @@ pub(crate) fn print_cryo_conclusion(
             "  {:>width$} / {} ({}%)",
             freeze_summary.errored.len().separate_with_commas(),
             &n_chunks_str,
-            format_float((100 * freeze_summary.errored.len() / n_chunks) as f64),
+            safe_percentage(freeze_summary.errored.len(), n_chunks),
             width = width
         ),
         4,
@@ -475,7 +475,7 @@ pub(crate) fn print_cryo_conclusion(
             "  {:>width$} / {} ({}%)",
             freeze_summary.skipped.len().separate_with_commas(),
             n_chunks_str,
-            format_float((100 * freeze_summary.skipped.len() / n_chunks) as f64),
+            safe_percentage(freeze_summary.skipped.len(), n_chunks),
             width = width
         ),
         4,
@@ -486,7 +486,7 @@ pub(crate) fn print_cryo_conclusion(
             "{:>width$} / {} ({}%)",
             freeze_summary.completed.len().separate_with_commas(),
             n_chunks_str,
-            format_float((100 * freeze_summary.completed.len() / n_chunks) as f64),
+            safe_percentage(freeze_summary.completed.len(), n_chunks),
             width = width
         ),
         4,
@@ -566,6 +566,11 @@ fn print_unit_speeds(name: String, n_completed: u64, total_time: f64) {
         4,
     );
     print_bullet_indent(name + " per day", format!("{:>width$}", per_day_str, width = 6), 4);
+}
+
+fn safe_percentage(n: usize, d: usize) -> String {
+    let f = if d == 0 { 0.0 } else { 100.0 * (n as f64) / (d as f64) };
+    format_float(f)
 }
 
 fn format_float(number: f64) -> String {
